@@ -9,16 +9,17 @@ public class PersonagemJogador extends Personagem{
 
     private static final int LARGURA = 48;
     private static final int ALTURA = 48;
-    private final int velocidade = 4;
+    private final int velocidade = 3;
     private final Fisica fisica;
     private BufferedImage spriteParado;
-    private BufferedImage spriteAndando1;
-    private BufferedImage spriteAndando2;
+    private BufferedImage spriteAndando1d;
+    private BufferedImage spriteAndando2d;
+    private BufferedImage spriteAndando3d;
     private BufferedImage spriteAtual;
 
     private int contadorAnimacao = 0;
-    private boolean primeiraPerna = true;
-    private static final int INTERVALO_ANIMACAO = 13; // quanto menor, mais rapido troca
+    private int primeiraPerna = 0;
+    private static final int INTERVALO_ANIMACAO = 7; // quanto menor, mais rapido troca
 
     public PersonagemJogador(int xInicial, int yInicial, double chaoY){
         this.x = xInicial;
@@ -30,8 +31,9 @@ public class PersonagemJogador extends Personagem{
     private void carregarSprites() {
         try {
             spriteParado = ImageIO.read(new File("sprites/megamanParado.png"));
-            spriteAndando1 = ImageIO.read(new File("sprites/megamanAndando.png"));
-            spriteAndando2 = ImageIO.read(new File("sprites/megamanAndando22.png"));
+            spriteAndando1d = ImageIO.read(new File("sprites/megamanAndando1D.png"));
+            spriteAndando2d = ImageIO.read(new File("sprites/megamanAndando2D.png"));
+            spriteAndando3d = ImageIO.read(new File("sprites/megamanAndando3D.png"));
             spriteAtual = spriteParado;
         } catch (IOException e) {
             System.out.println("Nao consegui carregar os sprites: " + e.getMessage());
@@ -48,9 +50,27 @@ public class PersonagemJogador extends Personagem{
         contadorAnimacao++;
         if (contadorAnimacao >= INTERVALO_ANIMACAO) {
             contadorAnimacao = 0;
-            primeiraPerna = !primeiraPerna;
-            spriteAtual = primeiraPerna ? spriteAndando1 : spriteAndando2;
+            switch (primeiraPerna++) {
+                case 0:
+                    spriteAtual = spriteAndando3d;
+                    break;
+                case 1:
+                    spriteAtual = spriteAndando2d;
+                    break;
+                case 2:
+                    spriteAtual = spriteAndando1d;
+                    break;
+                case 3:
+                    spriteAtual = spriteAndando2d;
+                    primeiraPerna = 0;
+                default:
+                    break;
+            }
         }
+    }
+    
+    public void pular(){
+        fisica.pular(8.5);
     }
 
     @Override

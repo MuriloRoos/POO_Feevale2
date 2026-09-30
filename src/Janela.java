@@ -16,7 +16,9 @@ public class Janela extends JPanel implements ActionListener{
     private Map<Integer, javax.swing.Timer> liberacoesPendentes = new HashMap<>();
     private final Obstaculo obstaculo = new Obstaculo(0, 300, 2000, 30);
     private final Obstaculo obstaculoParede = new Obstaculo(-1, 0, 1, 300);
-
+    private final BolinhaVitoria bolinha = new BolinhaVitoria(350, 260, 20);
+    private boolean venceu = false;
+ 
     public Janela(){
         personagem = new PersonagemJogador(50,100, 300 - 48);
 
@@ -54,6 +56,9 @@ public class Janela extends JPanel implements ActionListener{
         if(codigo == KeyEvent.VK_S) baixo = pressionada;
         if(codigo == KeyEvent.VK_A) esquerda = pressionada;
         if(codigo == KeyEvent.VK_D) direita = pressionada;
+        if (codigo == KeyEvent.VK_SPACE && pressionada) {
+            personagem.pular();
+        }
     }
 
     @Override
@@ -73,6 +78,11 @@ public class Janela extends JPanel implements ActionListener{
             }
         }
 
+        if (bolinha.isAtiva() && personagem.getBounds().intersects(bolinha.getBounds())) {
+            bolinha.coletar();
+            venceu = true;
+        }
+
         personagem.aplicarGravidade();
         repaint();
     }
@@ -83,6 +93,12 @@ public class Janela extends JPanel implements ActionListener{
         personagem.desenhar(g);
         obstaculo.desenhar(g);
         obstaculoParede.desenhar(g);
+        bolinha.desenhar(g);
+
+        if (venceu) {
+            g.setColor(Color.BLACK);
+            g.drawString("Você venceu!", 170, 150);
+        }
     }
 
     public static void main(String[] args) {
