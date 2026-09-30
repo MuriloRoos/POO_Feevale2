@@ -9,7 +9,7 @@ public class PersonagemJogador extends Personagem{
 
     private static final int LARGURA = 48;
     private static final int ALTURA = 48;
-    private final int velocidade = 3;
+    private final int velocidade = 6;
     private final Fisica fisica;
     private BufferedImage spriteParado;
     private BufferedImage spriteAndando1d;
@@ -19,13 +19,26 @@ public class PersonagemJogador extends Personagem{
 
     private int contadorAnimacao = 0;
     private int primeiraPerna = 0;
-    private static final int INTERVALO_ANIMACAO = 7; // quanto menor, mais rapido troca
+    private static final int INTERVALO_ANIMACAO = 5; // quanto menor, mais rapido troca
 
-    public PersonagemJogador(int xInicial, int yInicial, double chaoY){
+    public PersonagemJogador(int xInicial, int yInicial){
         this.x = xInicial;
         this.y = yInicial;
-        this.fisica = new Fisica(chaoY);
+        this.fisica = new Fisica();
         carregarSprites();
+    }
+
+    public int calcularProximaQuedaY() {
+        return (int) fisica.calcularQueda(this.y);
+    }
+    public void aplicarQueda(int novoY) {
+        this.y = novoY;
+        fisica.cair();
+    }
+
+    public void pousar(int novoY) {
+        this.y = novoY;
+        fisica.pousar();
     }
 
     private void carregarSprites() {
@@ -70,7 +83,7 @@ public class PersonagemJogador extends Personagem{
     }
     
     public void pular(){
-        fisica.pular(8.5);
+        fisica.pular(16);
     }
 
     @Override
@@ -84,9 +97,6 @@ public class PersonagemJogador extends Personagem{
         this.x += dx * velocidade;
     }
 
-    public void aplicarGravidade(){
-        this.y = (int) fisica.atualizar(this.y);
-    }
 
     @Override
     public Rectangle getBounds() {

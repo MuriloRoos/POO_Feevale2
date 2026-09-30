@@ -1,30 +1,25 @@
 public class Fisica {
 
     private double velocidadeY = 0;
-    private final double gravidade = 0.5;
-    private final double chaoY;
-    private boolean noChao = true;
+    private final double gravidade = 1.5 ;
+    private boolean noChao = false;
 
-    public Fisica(double chaoY){
-        this.chaoY = chaoY;
-    }
-
-    public double atualizar(double posY){
+    public double calcularQueda(double posY) {
         velocidadeY += gravidade;
-        posY += velocidadeY;
-
-        if(posY >= chaoY){
-            posY = chaoY;
-            velocidadeY = 0;
-            noChao = true;
-        } else {
-            noChao = false;
-        }
-        return posY;
+        return posY + velocidadeY;
     }
 
-    public void pular(double forca){
-        if(noChao){
+    public void pousar() {
+        velocidadeY = 0;
+        noChao = true;
+    }
+
+    public void cair() {
+        noChao = false;
+    }
+
+    public void pular(double forca) {
+        if (noChao) {
             velocidadeY = -forca;
             noChao = false;
         }

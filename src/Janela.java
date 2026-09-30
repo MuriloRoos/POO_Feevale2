@@ -1,49 +1,53 @@
-import java.awt.*;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.*; //recursos gráficos, como desenhos, cores e Rectangle.
+import javax.swing.JFrame; //cria a janela do jogo.
+import javax.swing.JPanel;//cria a área do jogo.
+import javax.swing.Timer; //controla o tempo e atualizações do jogo.
+import java.awt.event.ActionEvent; //representa um evento/ação.
+import java.awt.event.ActionListener; //define o que acontece quando ocorre uma ação.
+import java.awt.event.KeyAdapter; //facilita o controle pelo teclado.
+import java.awt.event.KeyEvent; //identifica qual tecla foi pressionada
+import java.util.HashMap; //armazenam dados em chave e valor.
+import java.util.Map; //armazenam dados em chave e valor.
+import java.util.List;
+import java.util.ArrayList;
 
 public class Janela extends JPanel implements ActionListener{
 
     private PersonagemJogador personagem;
     private boolean cima, baixo, esquerda, direita;
     private Map<Integer, javax.swing.Timer> liberacoesPendentes = new HashMap<>();
-    private final Obstaculo obstaculo = new Obstaculo(0, 300, 2000, 30);
-    private final Obstaculo obstaculoParede = new Obstaculo(-1, 0, 1, 300);
-    private final BolinhaVitoria bolinha = new BolinhaVitoria(350, 260, 20);
+    private final List<Obstaculo> obstaculos = new ArrayList<>();
+    private final BolinhaVitoria bolinha = new BolinhaVitoria(1400, 200, 35);
     private boolean venceu = false;
  
     public Janela(){
-        personagem = new PersonagemJogador(50,100, 300 - 48);
+        personagem = new PersonagemJogador(50,100);
+
+        obstaculos.add(new Obstaculo(0, 300, 1280, 30)); //chao
+        obstaculos.add(new Obstaculo(-1, 0, 1, 300)); //parede
+        //obstaculos.add(new Obstaculo(0, -1, 1920,15)); //teto
+        obstaculos.add(new Obstaculo(200, 270, 300, 30));
+        obstaculos.add(new Obstaculo(550, 210, 50, 100));
+        obstaculos.add(new Obstaculo(670, 260, 50,50));
+        obstaculos.add(new Obstaculo(670, 0, 50,180));
+        obstaculos.add(new Obstaculo(850, 250, 50,50));
+        obstaculos.add(new Obstaculo(970, 230, 100,70));
+        obstaculos.add(new Obstaculo(1120, 170, 50, 130));
+        obstaculos.add(new Obstaculo(1230, 120, 50,180));
+        obstaculos.add(new Obstaculo(1400, 300, 50,30));
+
+
 
         setFocusable(true);
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                int codigo = e.getKeyCode();
-                javax.swing.Timer pendente = liberacoesPendentes.remove(codigo);
-                if (pendente != null) {
-                    pendente.stop(); // cancela o "soltar" que tinha sido agendado: foi so o auto-repeat do SO
-                }
-                trataTecla(codigo, true);
+                trataTecla(e.getKeyCode(), true);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                int codigo = e.getKeyCode();
-                javax.swing.Timer adiar = new javax.swing.Timer(40, ev -> {
-                    trataTecla(codigo, false);
-                    liberacoesPendentes.remove(codigo);
-                });
-                adiar.setRepeats(false);
-                adiar.start();
-                liberacoesPendentes.put(codigo, adiar);
+                trataTecla(e.getKeyCode(), false);
             }
         });
 
@@ -73,26 +77,44 @@ public class Janela extends JPanel implements ActionListener{
             Rectangle proximaPosicao = personagem.getBounds();
             proximaPosicao.translate(dx * 4, 0);
 
-            if (!proximaPosicao.intersects(obstaculo.getBounds())) {
+            if (obstaculoQueColide(proximaPosicao) == null) {
                 personagem.mover(dx, 0);
             }
+        }
+
+        int proximoY = personagem.calcularProximaQuedaY();
+        Rectangle proximaPosicaoY = new Rectangle(personagem.getBounds().x, proximoY,
+                personagem.getBounds().width, personagem.getBounds().height);
+
+        Obstaculo chao = obstaculoQueColide(proximaPosicaoY);
+        if (chao != null) {
+            int novoY = chao.getBounds().y - personagem.getBounds().height;
+            personagem.pousar(novoY);
+        } else {
+            personagem.aplicarQueda(proximoY);
         }
 
         if (bolinha.isAtiva() && personagem.getBounds().intersects(bolinha.getBounds())) {
             bolinha.coletar();
             venceu = true;
         }
-
-        personagem.aplicarGravidade();
         repaint();
+    }
+    private Obstaculo obstaculoQueColide(Rectangle area) {
+        for (Obstaculo o : obstaculos) {
+            if (area.intersects(o.getBounds())) {
+                return o;
+            }
+        }
+        return null;
     }
 
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
         personagem.desenhar(g);
-        obstaculo.desenhar(g);
-        obstaculoParede.desenhar(g);
+        for(Obstaculo o : obstaculos)
+            o.desenhar(g);
         bolinha.desenhar(g);
 
         if (venceu) {
@@ -104,7 +126,7 @@ public class Janela extends JPanel implements ActionListener{
     public static void main(String[] args) {
         JFrame janela = new JFrame("Teste");
         Janela painel = new Janela();
-        painel.setPreferredSize(new java.awt.Dimension(1920, 1500));
+        painel.setPreferredSize(new java.awt.Dimension(1920, 1080));
 
         janela.add(painel);
         janela.pack();
