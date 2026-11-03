@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class Janela extends JPanel implements ActionListener{
 
     private PersonagemJogador personagem;
+    private PersonagemInimigo personagemInimigo;
     private boolean cima, baixo, esquerda, direita;
     private Map<Integer, javax.swing.Timer> liberacoesPendentes = new HashMap<>();
     private final List<Obstaculo> obstaculos = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Janela extends JPanel implements ActionListener{
  
     public Janela(){
         personagem = new PersonagemJogador(50,100);
+        personagemInimigo = new PersonagemInimigo(50, 70);
 
         obstaculos.add(new Obstaculo(0, 300, 1280, 30)); //chao
         obstaculos.add(new Obstaculo(-1, 0, 1, 300)); //parede
@@ -113,6 +115,7 @@ public class Janela extends JPanel implements ActionListener{
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
         personagem.desenhar(g);
+        personagemInimigo.desenhar(g);
         for(Obstaculo o : obstaculos)
             o.desenhar(g);
         bolinha.desenhar(g);

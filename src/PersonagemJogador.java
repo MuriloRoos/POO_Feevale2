@@ -16,7 +16,6 @@ public class PersonagemJogador extends Personagem{
     private BufferedImage spriteAndando2d;
     private BufferedImage spriteAndando3d;
     private BufferedImage spriteAtual;
-
     private int contadorAnimacao = 0;
     private int primeiraPerna = 0;
     private static final int INTERVALO_ANIMACAO = 5; // quanto menor, mais rapido troca
