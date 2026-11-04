@@ -8,7 +8,7 @@ public class PersonagemInimigo extends Personagem {
 
     public static final int LARGURA = 48;
     public static final int ALTURA = 48;
-    public final int velocidade = 6;
+    public final int velocidade = 3;
     public int posicaoFinal = 0;
 
     public PersonagemInimigo(int xInicial, int yInicial) {
@@ -24,8 +24,10 @@ public class PersonagemInimigo extends Personagem {
     }
 
     public void mover(int dx, int dy) {
-        if(x != posicaoFinal) {
-            this.x += -dx * velocidade;
+        if(x > -48) {
+            x -= velocidade;
+            if (x==-48)
+                x=1920;
         }
     }
 

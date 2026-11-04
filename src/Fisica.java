@@ -1,7 +1,7 @@
 public class Fisica {
 
     private double velocidadeY = 0;
-    private final double gravidade = 1.5 ;
+    private final double gravidade = 0.85 ;
     private boolean noChao = false;
 
     public double calcularQueda(double posY) {

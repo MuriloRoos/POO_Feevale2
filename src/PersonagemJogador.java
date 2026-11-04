@@ -9,7 +9,7 @@ public class PersonagemJogador extends Personagem{
 
     private static final int LARGURA = 48;
     private static final int ALTURA = 48;
-    private final int velocidade = 6;
+    private final int velocidade = 4;
     private final Fisica fisica;
     private BufferedImage spriteParado;
     private BufferedImage spriteAndando1d;
@@ -18,7 +18,7 @@ public class PersonagemJogador extends Personagem{
     private BufferedImage spriteAtual;
     private int contadorAnimacao = 0;
     private int primeiraPerna = 0;
-    private static final int INTERVALO_ANIMACAO = 5; // quanto menor, mais rapido troca
+    private static final int INTERVALO_ANIMACAO = 8; // quanto menor, mais rapido troca
 
     public PersonagemJogador(int xInicial, int yInicial){
         this.x = xInicial;

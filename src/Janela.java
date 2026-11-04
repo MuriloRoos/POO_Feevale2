@@ -15,7 +15,7 @@ public class Janela extends JPanel implements ActionListener{
 
     private PersonagemJogador personagem;
     private PersonagemInimigo personagemInimigo;
-    private boolean cima, baixo, esquerda, direita;
+    private boolean esquerda, direita;
     private Map<Integer, javax.swing.Timer> liberacoesPendentes = new HashMap<>();
     private final List<Obstaculo> obstaculos = new ArrayList<>();
     private final BolinhaVitoria bolinha = new BolinhaVitoria(1400, 200, 35);
@@ -23,7 +23,8 @@ public class Janela extends JPanel implements ActionListener{
  
     public Janela(){
         personagem = new PersonagemJogador(50,100);
-        personagemInimigo = new PersonagemInimigo(50, 70);
+
+        personagemInimigo = new PersonagemInimigo(1920, 70);
 
         obstaculos.add(new Obstaculo(0, 300, 1280, 30)); //chao
         obstaculos.add(new Obstaculo(-1, 0, 1, 300)); //parede
@@ -37,6 +38,8 @@ public class Janela extends JPanel implements ActionListener{
         obstaculos.add(new Obstaculo(1120, 170, 50, 130));
         obstaculos.add(new Obstaculo(1230, 120, 50,180));
         obstaculos.add(new Obstaculo(1400, 300, 50,30));
+        obstaculos.add(new Obstaculo(0, 1030, 1920, 50));
+        
 
 
 
@@ -58,8 +61,6 @@ public class Janela extends JPanel implements ActionListener{
     }
 
     private void trataTecla(int codigo, boolean pressionada){
-        if(codigo == KeyEvent.VK_W) cima = pressionada;
-        if(codigo == KeyEvent.VK_S) baixo = pressionada;
         if(codigo == KeyEvent.VK_A) esquerda = pressionada;
         if(codigo == KeyEvent.VK_D) direita = pressionada;
         if (codigo == KeyEvent.VK_SPACE && pressionada) {
@@ -74,6 +75,7 @@ public class Janela extends JPanel implements ActionListener{
         if (direita) dx += 1;
 
         personagem.animar(dx != 0);
+        personagemInimigo.mover(0, 0);
 
         if (dx != 0) {
             Rectangle proximaPosicao = personagem.getBounds();
@@ -130,10 +132,10 @@ public class Janela extends JPanel implements ActionListener{
         JFrame janela = new JFrame("Teste");
         Janela painel = new Janela();
         painel.setPreferredSize(new java.awt.Dimension(1920, 1080));
-
         janela.add(painel);
         janela.pack();
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         janela.setVisible(true);
+
     }
 }

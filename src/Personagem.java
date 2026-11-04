@@ -7,7 +7,6 @@ public abstract class Personagem {
     protected int y;
     protected final int largura = 48;
     protected final int altura = 48;
-    protected final int velocidade = 4;
 
     public abstract void desenhar(Graphics g);
 
