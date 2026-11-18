@@ -1,4 +1,3 @@
-
 import java.awt.Rectangle;
 public abstract class DecoradorDePersonagem extends Personagem{
     protected Personagem personagem;

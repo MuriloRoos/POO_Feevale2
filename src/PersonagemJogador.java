@@ -19,6 +19,7 @@ public class PersonagemJogador extends Personagem{
     private int contadorAnimacao = 0;
     private int primeiraPerna = 0;
     private static final int INTERVALO_ANIMACAO = 8; // quanto menor, mais rapido troca
+    private int vida = 10;
 
     public PersonagemJogador(int xInicial, int yInicial){
         this.x = xInicial;
@@ -101,4 +102,26 @@ public class PersonagemJogador extends Personagem{
     public Rectangle getBounds() {
         return new Rectangle(x, y, LARGURA, ALTURA);
     }
+
+    public boolean estaCaindo() {
+        return fisica.getVelocidadeY() > 0;
+    }
+
+    public boolean estaSubindo() {
+        return fisica.getVelocidadeY() < 0;
+    }
+
+    public void baterCabeca(int novoY) {
+        this.y = novoY;
+        fisica.baterCabeca();
+    }
+
+    public int getVida(){
+        return vida;
+    }
+
+    public void setVida(int vida){
+        this.vida = vida;
+    }
+
 }

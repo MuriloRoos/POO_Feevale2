@@ -16,29 +16,51 @@ public class Janela extends JPanel implements ActionListener{
     private PersonagemJogador personagem;
     private PersonagemInimigo personagemInimigo;
     private boolean esquerda, direita;
+    private boolean menu = false;
     private Map<Integer, javax.swing.Timer> liberacoesPendentes = new HashMap<>();
     private final List<Obstaculo> obstaculos = new ArrayList<>();
     private final BolinhaVitoria bolinha = new BolinhaVitoria(1400, 200, 35);
     private boolean venceu = false;
+    private boolean perdeu = false;
+    private int cameraX = 0;
+
  
     public Janela(){
+        setBackground(Color.DARK_GRAY);
         personagem = new PersonagemJogador(50,100);
 
         personagemInimigo = new PersonagemInimigo(1920, 70);
 
-        obstaculos.add(new Obstaculo(0, 300, 1280, 30)); //chao
-        obstaculos.add(new Obstaculo(-1, 0, 1, 300)); //parede
-        //obstaculos.add(new Obstaculo(0, -1, 1920,15)); //teto
+        obstaculos.add(new Obstaculo(0, 300, 2200, 30)); // chão
+        obstaculos.add(new Obstaculo(-1, 0, 1, 300)); // parede esquerda
+        // obstaculos.add(new Obstaculo(0, -1, 2200, 15)); // teto
+
         obstaculos.add(new Obstaculo(200, 270, 300, 30));
         obstaculos.add(new Obstaculo(550, 210, 50, 100));
-        obstaculos.add(new Obstaculo(670, 260, 50,50));
-        obstaculos.add(new Obstaculo(670, 0, 50,180));
-        obstaculos.add(new Obstaculo(850, 250, 50,50));
-        obstaculos.add(new Obstaculo(970, 230, 100,70));
+        obstaculos.add(new Obstaculo(670, 260, 50, 50));
+        obstaculos.add(new Obstaculo(670, 0, 50, 180));
+        obstaculos.add(new Obstaculo(850, 250, 50, 50));
+        obstaculos.add(new Obstaculo(970, 230, 100, 70));
         obstaculos.add(new Obstaculo(1120, 170, 50, 130));
-        obstaculos.add(new Obstaculo(1230, 120, 50,180));
-        obstaculos.add(new Obstaculo(1400, 300, 50,30));
-        obstaculos.add(new Obstaculo(0, 1030, 1920, 50));
+        obstaculos.add(new Obstaculo(1230, 120, 50, 180));
+        obstaculos.add(new Obstaculo(1400, 300, 150, 30));
+
+        // Novos obstáculos
+        obstaculos.add(new Obstaculo(1650, 260, 100, 40));
+        obstaculos.add(new Obstaculo(1800, 210, 50, 90));
+        obstaculos.add(new Obstaculo(1950, 250, 100, 50));
+        obstaculos.add(new Obstaculo(2100, 180, 50, 120));
+        obstaculos.add(new Obstaculo(2250, 230, 150, 70));
+        obstaculos.add(new Obstaculo(2450, 150, 50, 150));
+        obstaculos.add(new Obstaculo(2600, 270, 150, 30));
+        obstaculos.add(new Obstaculo(2800, 200, 100, 100));
+        obstaculos.add(new Obstaculo(3000, 250, 100, 50));
+
+        // Parede final
+        obstaculos.add(new Obstaculo(3150, 0, 1, 300));
+
+        // Chão inferior
+        obstaculos.add(new Obstaculo(0, 1030, 3200, 50));
         
 
 
@@ -56,7 +78,7 @@ public class Janela extends JPanel implements ActionListener{
             }
         });
 
-        Timer loop = new Timer(16, this);
+        Timer loop = new Timer(10, this); //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
         loop.start();
     }
 
@@ -65,7 +87,8 @@ public class Janela extends JPanel implements ActionListener{
         if(codigo == KeyEvent.VK_D) direita = pressionada;
         if (codigo == KeyEvent.VK_SPACE && pressionada) {
             personagem.pular();
-        }
+        } 
+        if(codigo == KeyEvent.VK_ESCAPE) menu = pressionada;
     }
 
     @Override
@@ -73,6 +96,8 @@ public class Janela extends JPanel implements ActionListener{
         int dx = 0;
         if (esquerda) dx -= 1;
         if (direita) dx += 1;
+
+        if (menu)
 
         personagem.animar(dx != 0);
         personagemInimigo.mover(0, 0);
@@ -85,15 +110,27 @@ public class Janela extends JPanel implements ActionListener{
                 personagem.mover(dx, 0);
             }
         }
-
+ 
         int proximoY = personagem.calcularProximaQuedaY();
         Rectangle proximaPosicaoY = new Rectangle(personagem.getBounds().x, proximoY,
                 personagem.getBounds().width, personagem.getBounds().height);
 
         Obstaculo chao = obstaculoQueColide(proximaPosicaoY);
+
         if (chao != null) {
-            int novoY = chao.getBounds().y - personagem.getBounds().height;
-            personagem.pousar(novoY);
+
+            if (personagem.estaCaindo()) {
+
+                // Está descendo: pousou em cima do obstáculo
+                int novoY = chao.getBounds().y - personagem.getBounds().height;
+                personagem.pousar(novoY);
+
+            } else if (personagem.estaSubindo()) {
+
+                int novoY = chao.getBounds().y + chao.getBounds().height;
+                personagem.baterCabeca(novoY);
+            }
+
         } else {
             personagem.aplicarQueda(proximoY);
         }
@@ -102,7 +139,29 @@ public class Janela extends JPanel implements ActionListener{
             bolinha.coletar();
             venceu = true;
         }
+
+
+        if(personagem.getBounds().intersects(personagemInimigo.getBounds())){
+            personagem.mover(-48, 70);
+            personagem.setVida(personagem.getVida() -1);
+        }
+
+        // if(personagem.getVida() == 0){
+        //     personagem.mover(500, 69);
+
+        // }
+
+                // Dentro do actionPerformed, antes do repaint();
+        int limiteTelaX = 600; // Ponto X onde a câmera começa a seguir o jogador
+
+        if (personagem.getBounds().x > limiteTelaX) {
+            cameraX = personagem.getBounds().x - limiteTelaX;
+        } else {
+            cameraX = 0; // Não deixa a câmera voltar antes do início da fase
+        }
+
         repaint();
+
     }
     private Obstaculo obstaculoQueColide(Rectangle area) {
         for (Obstaculo o : obstaculos) {
@@ -113,20 +172,42 @@ public class Janela extends JPanel implements ActionListener{
         return null;
     }
 
-    @Override
-    protected void paintComponent(Graphics g){
+
+   @Override
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        personagem.desenhar(g);
-        personagemInimigo.desenhar(g);
-        for(Obstaculo o : obstaculos)
-            o.desenhar(g);
-        bolinha.desenhar(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        // 1. Move a câmera para acompanhar o personagem
+        g2d.translate(-cameraX, 0);
+
+        // Desenha os elementos do cenário
+        personagem.desenhar(g2d);
+        personagemInimigo.desenhar(g2d);
+        for (Obstaculo o : obstaculos) {
+            o.desenhar(g2d);
+        }
+        bolinha.desenhar(g2d);
+
+        // 2. Reseta a câmera para desenhar os textos fixos na tela
+        g2d.translate(cameraX, 0);
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+        g.drawString("VIDA: " + personagem.getVida(), 1300, 30);
 
         if (venceu) {
-            g.setColor(Color.BLACK);
+            g.setColor(Color.YELLOW);
             g.drawString("Você venceu!", 170, 150);
         }
+
+        if (perdeu) {
+            g.setColor(Color.CYAN);
+            g.drawString("Voce Perdeu!", 170, 150);
+        }
     }
+
 
     public static void main(String[] args) {
         JFrame janela = new JFrame("Teste");
